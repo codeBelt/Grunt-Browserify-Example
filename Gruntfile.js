@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 
+    var remapify = require('remapify');
+
     // Project configuration.
     grunt.initConfig({
 
@@ -35,13 +37,17 @@ module.exports = function(grunt) {
             }
         },
 
-        // https://github.com/thlorenz/browserify-shim
-        // https://github.com/thlorenz/browserify-shim/issues/40#issuecomment-40272317
         browserify: {
             web: {
                 options: {
                     preBundleCB: function(bundle) {
+                        bundle.require('./src/assets/vendor/handlebars/handlebars.runtime.min.js');
                         bundle.require('./src/assets/scripts/templates.js');
+                        bundle.plugin(remapify, [{
+                            cwd: './src/assets/vendor/structurejs/js',
+                            src: '**/*.js',
+                            expose: 'structurejs'
+                        }]);
                     }
                 },
                 files: {
@@ -63,6 +69,7 @@ module.exports = function(grunt) {
                     src: [
                         'index.html',
                         'assets/media/**',
+                        'assets/vendor/todomvc-common/bg.png',
                         'assets/{styles,vendor}/**/*.css',
                         'assets/vendor/jquery/dist/jquery.js',
                         '!assets/vendor/structurejs/**'
@@ -77,8 +84,8 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: [
-                    'src/assets/vendor/handlebars/handlebars.min.js',
-                    'src/assets/scripts/templates.js',
+                    //'src/assets/vendor/handlebars/handlebars.min.js',
+                    //'src/assets/scripts/templates.js',
                     'web/assets/scripts/main.js'
                 ],
                 dest: 'web/assets/scripts/main.js'
