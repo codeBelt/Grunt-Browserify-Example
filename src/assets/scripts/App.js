@@ -20,7 +20,22 @@ var App = (function () {
     function App() {
         _super.call(this);
 
+        /**
+         * TODO: YUIDoc_comment
+         *
+         * @property _title
+         * @type {string}
+         * @private
+         */
         this._title = 'Grunt Browserify Example';
+
+        /**
+         * TODO: YUIDoc_comment
+         *
+         * @property _anotherClass
+         * @type {AnotherClass}
+         * @private
+         */
         this._anotherClass = null;
     }
 
