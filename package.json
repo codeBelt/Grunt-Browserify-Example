@@ -7,13 +7,10 @@
   "author": "",
   "license": "ISC",
   "browser": {
-    "jquery": "./src/assets/vendor/jquery/dist/jquery.js",
-    "handlebars": "./src/assets/vendor/handlebars/handlebars.min.js"
+    "jquery": "./src/assets/vendor/jquery/dist/jquery.js"
   },
   "browserify-shim": {
-    "jquery": "global:$",
-    "handlebars": "global:Handlebars",
-    "three": "global:THREE"
+    "jquery": "global:$"
   },
   "browserify": {
     "transform": [
@@ -32,6 +29,11 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-express": "^1.4.1",
     "grunt-open": "~0.2.3",
-    "remapify": "^2.0.1"
+    "remapify": "^2.0.1",
+    "jit-grunt": "^0.9.1",
+    "time-grunt": "^1.2.0",
+    "grunt-usemin": "^3.0.0",
+    "grunt-contrib-cssmin": "^0.12.3",
+    "grunt-contrib-uglify": "^0.9.1"
   }
 }

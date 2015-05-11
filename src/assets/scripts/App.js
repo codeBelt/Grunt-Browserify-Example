@@ -1,6 +1,5 @@
 'use strict';
 
-// Imports
 var Extend = require('structurejs/util/Extend');
 var BaseView = require('./view/BaseView');
 var AnotherClass = require('./view/AnotherClass');

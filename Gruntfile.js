@@ -2,6 +2,12 @@ module.exports = function(grunt) {
 
     var remapify = require('remapify');
 
+    // Uncomment the next line to report the Grunt execution time (for optimization, etc)
+    //require('time-grunt')(grunt);
+
+    // Intelligently lazy-loads tasks and plugins as needed at runtime.
+    require('jit-grunt')(grunt);
+
     // Project configuration.
     grunt.initConfig({
 
@@ -9,8 +15,38 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-        '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '* Copyright (c) <%= grunt.template.today("yyyy") %> ',
+            '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
+            '* Copyright (c) <%= grunt.template.today("yyyy") %> ',
+
+        /**
+         * Deletes our production folder before we create a new build.
+         */
+        clean: {
+            web: ['web']
+        },
+
+        /**
+         * Takes our CommonJS files and compiles them together.
+         */
+        browserify: {
+            web: {
+                options: {
+                    preBundleCB: function(bundle) {
+                        // Creates a CommonJS module around the script(s) in the file.
+                        bundle.require('./src/assets/scripts/templates.js');
+                        // Creates a alias for a library that is already CommonJS.
+                        bundle.plugin(remapify, [{
+                            cwd: './src/assets/vendor/structurejs/js',
+                            src: '**/*.js',
+                            expose: 'structurejs'
+                        }]);
+                    }
+                },
+                files: {
+                    'web/assets/scripts/main.js': ['src/assets/scripts/main.js']
+                }
+            }
+        },
 
         /**
          * Compiles the Handlebars templates into pre-compiled handlebars templates
@@ -37,29 +73,9 @@ module.exports = function(grunt) {
             }
         },
 
-        browserify: {
-            web: {
-                options: {
-                    preBundleCB: function(bundle) {
-                        //bundle.require('./src/assets/vendor/handlebars/handlebars.runtime.min.js');
-                        bundle.require('./src/assets/scripts/templates.js');
-                        bundle.plugin(remapify, [{
-                            cwd: './src/assets/vendor/structurejs/js',
-                            src: '**/*.js',
-                            expose: 'structurejs'
-                        }]);
-                    }
-                },
-                files: {
-                    'web/assets/scripts/main.js': ['src/assets/scripts/main.js']
-                }
-            }
-        },
-
-        clean: {
-            web: ['web']
-        },
-
+        /**
+         * Copy and needed files to the web folder.
+         */
         copy: {
             styles: {
                 files: [{
@@ -78,14 +94,16 @@ module.exports = function(grunt) {
             }
         },
 
+        /**
+         * Merge and files with the generated Browserify file.
+         */
         concat: {
             options: {
                 separator: ';'
             },
             dist: {
                 src: [
-                    'src/assets/vendor/handlebars/handlebars.min.js',
-                    //'src/assets/scripts/templates.js',
+                    'src/assets/vendor/handlebars/handlebars.runtime.min.js',
                     'web/assets/scripts/main.js'
                 ],
                 dest: 'web/assets/scripts/main.js'
@@ -117,8 +135,11 @@ module.exports = function(grunt) {
             }
         },
 
+        /**
+         * Watches files and will run task(s) when files are changed. It will also reload/refresh the browser.
+         */
         watch: {
-            src: {
+            markup: {
                 options: {
                     livereload: true
                 },
@@ -130,7 +151,7 @@ module.exports = function(grunt) {
                     livereload: true
                 },
                 files: ['src/**/*.js'],
-                tasks: ['browserify', 'copy', 'concat']
+                tasks: ['browserify', 'copy']
             },
             templates: {
                 options: {
@@ -142,17 +163,12 @@ module.exports = function(grunt) {
         }
     });
 
-    // These plugins provide necessary tasks.
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-browserify');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-express');
-    grunt.loadNpmTasks('grunt-open');
-    grunt.loadNpmTasks('grunt-contrib-handlebars');
-
-    // Default task
+    /**
+     * Grunt tasks:
+     *
+     * grunt            (Will build code for production)
+     * grunt launch     (Will build code for production and open the browser with the application)
+     */
     grunt.registerTask('default', [
         'clean',
         'browserify',
@@ -171,6 +187,5 @@ module.exports = function(grunt) {
         'open',
         'watch'
     ]);
-
 
 };
