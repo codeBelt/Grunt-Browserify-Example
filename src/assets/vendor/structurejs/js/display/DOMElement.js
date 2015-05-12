@@ -3,9 +3,9 @@
  */
 (function(root, factory) {
     if (typeof define === 'function' && define.amd) {
-        define(['../util/Extend', '../display/DisplayObjectContainer', '../event/BaseEvent', '../util/TemplateFactory', '../util/ComponentFactory', 'jquery', '../plugin/jquery.eventListener'], factory);
+        define(['../util/Extend', '../display/DisplayObjectContainer', '../event/BaseEvent', '../util/TemplateFactory', '../util/ComponentFactory', '../plugin/jquery.eventListener'], factory);
     } else if (typeof module !== 'undefined' && module.exports) {
-        module.exports = factory(require('../util/Extend'), require('../display/DisplayObjectContainer'), require('../event/BaseEvent'), require('../util/TemplateFactory'), require('../util/ComponentFactory'), require('jquery'), require('../plugin/jquery.eventListener'));
+        module.exports = factory(require('../util/Extend'), require('../display/DisplayObjectContainer'), require('../event/BaseEvent'), require('../util/TemplateFactory'), require('../util/ComponentFactory'), require('../plugin/jquery.eventListener'));
     } else {
         /*jshint sub:true */
         root.StructureJS = root.StructureJS || {};
@@ -537,6 +537,7 @@
          *
          * @method createComponents
          * @param componentList (Array.<{ selector: string; componentClass: DisplayObjectContainer }>
+         * @return {Array.<DOMElement>} Returns all the items created from this createComponents method.
          * @public
          * @chainable
          * @example
@@ -551,13 +552,16 @@
          *      };
          */
         DOMElement.prototype.createComponents = function(componentList) {
+            var list;
+            var createdChildren = [];
             var length = componentList.length;
             var obj;
             for (var i = 0; i < length; i++) {
                 obj = componentList[i];
-                ComponentFactory.create(this.$element.find(obj.selector), obj.componentClass, this);
+                list = ComponentFactory.create(this.$element.find(obj.selector), obj.componentClass, this);
+                createdChildren = createdChildren.concat(list);
             }
-            return this;
+            return createdChildren;
         };
         return DOMElement;
     })();
